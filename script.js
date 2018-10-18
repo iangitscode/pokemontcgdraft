@@ -1,6 +1,10 @@
-
-const baseurl = "https://api.pokemontcg.io/v1/"
+const N = 3
+const BASEURL = "https://api.pokemontcg.io/v1/"
 let sets;
+let currentChoices;
+let preloaded;
+let allSelectedCards = [];
+const cardObservable = new Rx.Subject();
 
 function getCardSlot(index) {
 	switch (index) {
@@ -13,52 +17,109 @@ function getCardSlot(index) {
 	}
 }
 
-
 /*
- * Sends an HTTP request and returns a promise that resolves when the response is received
+ * Sends an HTTP request and sends the response to cardObservable
  */
 function makeAsyncRequest(requestUrl) {
 	let xmlHttp = new XMLHttpRequest();
-	return new Promise((resolve, reject) => {
-  		xmlHttp.onreadystatechange = (response) => {
-  			if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            	resolve(xmlHttp.responseText);
-  			}
-  		}
-    	xmlHttp.open("GET", requestUrl, true);
-    	xmlHttp.send(null);
-	});
+	xmlHttp.onreadystatechange = () => {
+		if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+			cardObservable.next(JSON.parse(xmlHttp.responseText));
+		} else if (xmlHttp.readyState == 4 && xmlHttp.status != 200) {
+			pickRandomCard();
+		}
+	}
+	xmlHttp.open("GET", requestUrl, true);
+	xmlHttp.send(null);
 }
-
-/*
- * Returns a promise for the raw data for a card
- */
 
 function pickRandomCard() {
 	let set = sets[Math.floor(Math.random() * sets.length)];
 	let setSize = set.totalCards;
 	let cardInSet = Math.floor(Math.random() * setSize) + 1
 	let setCode = set.code;
-	let request = baseurl + "cards/" + setCode + "-" + cardInSet;
-	return makeAsyncRequest(request);
+	let request = BASEURL + "cards/" + setCode + "-" + cardInSet;
+	makeAsyncRequest(request);
 }
 
-function getThreeCards() {
-	let a = pickRandomCard();
-	let b = pickRandomCard();
-	let c = pickRandomCard();
-	Promise.all([a,b,c]).then((values) => {
-		console.log("HI")
-		for (let index in values) {
-			let obj = JSON.parse(values[index]);
-			console.log(obj);
-			// document.getElementById(getCardSlot(index)).style.backgroundImage = "url(" + obj.
+/*
+ * 
+ */
+function pickRandomCards() {
+	for (let i = 0; i < N; i++) {
+		pickRandomCard();
+	}
+}
+
+function drawImages() {
+	for (let i = 0; i < N; i++) {
+		document.getElementById(getCardSlot(i)).style.backgroundImage = "url(" + currentChoices[i].card.imageUrl + ")";
+	}
+}
+
+function getNewCards() {
+	if (preloaded == undefined) {
+		pickRandomCards();
+	}
+	currentChoices = preloaded;
+	pickRandomCards();
+	drawImages();
+}
+
+/*
+ * Called when the user clicks on a card
+ */
+function selectCard(index) {
+	if (index < currentChoices.length) {
+		addToSelected(currentChoices[index]);
+	} else {
+		console.error("Card selection choice out of range!");
+	}
+}
+
+function addToSelected(card) {
+	allSelectedCards.push(card);
+
+	let container = document.getElementById("selectedContainer");
+	let elem = document.createElement("div");
+	elem.classList.add("selectedCard");
+	elem.style.backgroundImage = "url(" + card.card.imageUrl + ")";
+	container.appendChild(elem);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Set up observable listening for cards
+	cardObservable.bufferCount(N).subscribe((cards) => {
+		if (currentChoices == undefined) {
+			currentChoices = cards;
+			drawImages();
+		} else {
+			preloaded = cards;
+			for (let i = 0; i < N; i++) {
+				document.getElementsByClassName("preload")[i].style.backgroundImage = "url(" + preloaded[i].card.imageUrl + ")";
+			}
 		}
 	});
-}
 
-// Get list of all sets
-Rx.Observable.fromPromise(makeAsyncRequest(baseurl + "sets/")).subscribe((data) => {
-	sets = JSON.parse(data).sets;
-});
+	// Get list of all sets
+	getSetsHttp = new XMLHttpRequest();
+	getSetsHttp.onreadystatechange = () => {
+		if (getSetsHttp.readyState == 4 && getSetsHttp.status == 200) {
+			sets = JSON.parse(getSetsHttp.responseText).sets;
+			// Actual cards that are picked
+			pickRandomCards();
+			// Preload the next cards
+			pickRandomCards();
+		}
+	}
+	getSetsHttp.open("GET", BASEURL + "sets/", true);
+	getSetsHttp.send(null);
+
+	for (let i = 0; i < 3; i++) {
+		document.getElementById(getCardSlot(i)).addEventListener("click", () => {
+			selectCard(i);
+			getNewCards();
+		});
+	}
+}, false);
 

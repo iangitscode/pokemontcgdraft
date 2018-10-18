@@ -1,0 +1,36 @@
+.card {
+	height: 342px;
+	width: 245px;
+	cursor: pointer;
+	background-size: contain;
+}
+
+.selectionBox {
+	margin: 10px;
+}
+
+.selectionContainer {
+	display: flex;
+}
+
+.preload {
+	background: no-repeat -9999px -9999px;
+}
+
+.selectedContainer {
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 640px;
+	height: 90%;
+	overflow: auto;
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-start;
+}
+
+.selectedCard {
+	height: 171px;
+	width: 122px;
+	background-size: contain;
+}

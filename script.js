@@ -87,6 +87,42 @@ function addToSelected(card) {
 	container.appendChild(elem);
 }
 
+function createSetlist() {
+	for (let set of sets) {
+		let inputElem = document.createElement("input");
+		let box = document.createElement("div");
+		box.innerText = set.name;
+
+		box.classList.add("set");
+		inputElem.classList.add("checkbox");
+
+		inputElem.setAttribute("type","checkbox");
+		box.appendChild(inputElem);
+		document.getElementById("setsForm").appendChild(box);
+	}
+}
+
+function getSetNameFromId(id) {
+	let idName = id.split("-")[0];
+	for (let set of sets) {
+		if (set.code == idName) return set.ptcgoCode;
+	}
+	alert("Uh oh...something broke");
+	return "";
+}
+
+function exportCards() {
+	output = "";
+	for (let card of allSelectedCards) {
+		// Dumb JSON things
+		card = card.card;
+
+		line = "1 " + card.name + " (" + getSetNameFromId(card.id) + " " + card.number + ")" + '\n';
+		output += line;
+	}
+	return output;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     // Set up observable listening for cards
 	cardObservable.bufferCount(N).subscribe((cards) => {
@@ -106,10 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	getSetsHttp.onreadystatechange = () => {
 		if (getSetsHttp.readyState == 4 && getSetsHttp.status == 200) {
 			sets = JSON.parse(getSetsHttp.responseText).sets;
-			// Actual cards that are picked
-			pickRandomCards();
-			// Preload the next cards
-			pickRandomCards();
+			createSetlist();
 		}
 	}
 	getSetsHttp.open("GET", BASEURL + "sets/", true);
@@ -121,5 +154,33 @@ document.addEventListener('DOMContentLoaded', () => {
 			getNewCards();
 		});
 	}
+
+	document.getElementById("submitButton").addEventListener("click", () => {
+		let checkboxes = document.getElementsByClassName("checkbox");
+		let newSets = [];
+		for (let index in checkboxes) {
+			if (checkboxes[index].checked) {
+				newSets.push(sets[index])
+			}
+		}
+
+		if (newSets.length > 0) {
+			sets = newSets;
+
+			// First set of cards
+			pickRandomCards();
+			// Preload the next cards
+			pickRandomCards();	
+		} else {
+			alert("Please select at least one set.");
+		}
+		
+	});
+
+	document.getElementById("export").addEventListener("click", () => {
+		document.getElementById("setsForm").classList.add("disabled");
+		document.getElementById("outputField").style.display = "block";
+		document.getElementById("outputField").innerText = exportCards();
+	});
 }, false);
 

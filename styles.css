@@ -18,11 +18,8 @@
 }
 
 .selectedContainer {
-	position: absolute;
-	right: 0;
-	top: 0;
 	width: 640px;
-	height: 90%;
+	height: 684px;
 	overflow: auto;
 	display: flex;
 	flex-wrap: wrap;
@@ -33,4 +30,54 @@
 	height: 171px;
 	width: 122px;
 	background-size: contain;
+}
+
+.setsForm {
+	display: flex;
+	height: 400px;
+	width: 800px;
+	flex-wrap: wrap;
+	overflow: auto;
+}
+
+.set {
+	margin-right: 10px;
+	margin-bottom: 10px;
+}
+
+.set:hover {
+	background-color: #ccccff;
+}
+
+.checkbox {
+	cursor: pointer;
+}
+
+.button {
+	display: inline-block;
+	cursor: pointer;
+	border: 3px solid black;
+	padding: 5px;
+	border-radius: 4px;
+}
+
+.button:hover {
+	background-color: #999999;
+}
+
+.outputField {
+	display: none;
+	height: 400px;
+	overflow: auto;
+}
+
+.disabled > * {
+	pointer-events: none;
+	opacity: 0.7;
+}
+
+.rightPanel {
+	position: absolute;
+	top: 0;
+	right: 0;
 }

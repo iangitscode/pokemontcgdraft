@@ -1,44 +1,72 @@
 <html>
-	<head>
-		<script src="https://npmcdn.com/@reactivex/rxjs@5.0.0-beta.6/dist/global/Rx.umd.js"></script>
-		<script src="script.js"></script>
-		<link rel="stylesheet" type="text/css" href="styles.css">
-	</head>
-	<body>
-		<div class="preload"></div>
-		<div class="preload"></div>
-		<div class="preload"></div>
-		<div class="selectionContainer">
-			<div class="selectionBox">
-				<div class="card" id="cardone">
+  <head>
+    <script src="https://npmcdn.com/@reactivex/rxjs@5.0.0-beta.6/dist/global/Rx.umd.js"></script>
+    <script src="script.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head>
+  <body>
+    <div class="preload"></div>
+    <div class="preload"></div>
+    <div class="preload"></div>
+    
+    <div class="restart button" onclick="location.reload();">
+      Restart
+    </div>
 
-				</div>
-			</div>
-			<div class="selectionBox">
-				<div class="card" id="cardtwo">
+    <div class="stageContainer stageOneContainer"> 
+      <div class="stage stageOne" id="stageOne">
+        <div class="title">
+          Pokémon TCG Arena Draft
+        </div>
+        <form class="setsForm" id="setsForm"></form>
+        <div class="button" id="submitButton">
+          Start Draft
+        </div>
+      </div>
+    </div>
 
-				</div>
-			</div>
-			<div class="selectionBox">
-				<div class="card" id="cardthree">
+    <div class="stageContainer stageTwoContainer">
+      <div class="stage stageTwo" id="stageTwo">
+        <div class="title">
+          Select Cards
+        </div>
+        <div class="selectedAndSelectionContainer">
+          <div class="selectedContainer" id="selectedContainer"></div>
+          <div class="selectionContainer" id="selectionContainer">
+            <div class="selectionBox">
+              <div class="card" id="cardone"></div>
+              <div class="arrow"></div>
+            </div>
+            <div class="selectionBox">
+              <div class="card" id="cardtwo"></div>
+              <div class="arrow"></div>
+            </div>
+            <div class="selectionBox">
+              <div class="card" id="cardthree"></div>
+              <div class="arrow"></div>
+            </div>
+          </div> 
+        </div>
 
-				</div>
-			</div>
-		</div>
-		<div class="rightPanel">
-			<div class="selectedContainer" id="selectedContainer"></div>
-			<div class="outputField" id="outputField"></div>
-		</div>
-
-		<form class="setsForm" id="setsForm"></form>		
-		<div class="button" id="submitButton">
-			Start Draft
-		</div>
-		<div class="button" id="export">
-			Export Deck
-		</div>
-		<div class="button" onclick="location.reload();">
-			Restart
-		</div>
-	</body>
+        <div class="buttonContainer">
+          <div class="button" id="export">
+            Export Deck
+          </div>
+          <div class="button" id="toggleShowSelected">
+            Show Selected
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="stageContainer stageThreeContainer">
+      <div class="stage stageThree" id="stageThree">
+        <div class="title" id="numCardsChosen"></div>
+        <textarea class="outputField" id="outputField"></textarea>
+          <div class="button" id="copyText">
+            Copy Text
+          </div>
+      </div>
+    </div>
+  </body>
 </html>
